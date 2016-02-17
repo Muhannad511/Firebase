@@ -1,5 +1,6 @@
 package com.cecs492a_group4.firebase;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -30,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Firebase.setAndroidContext(this);
+        Firebase.setAndroidContext(this);
 
 
-        //mRef = new Firebase(DB_URL);
+        mRef = new Firebase(DB_URL);
 
 
 
@@ -47,10 +48,25 @@ public class MainActivity extends AppCompatActivity {
         if (v.getId() == R.id.BLogin) {
             EditText e = (EditText) findViewById(R.id.TFemailLogin);
             String email = e.getText().toString();
-            EditText p = (EditText) findViewById(R.id.TFloginPassword);
-            String password = p.getText().toString();
+            final EditText p = (EditText) findViewById(R.id.TFloginPassword);
+            final String password = p.getText().toString();
             Log.d("email: ",email);
             Log.d("password: ",password);
+            mRef.authWithPassword(email, password, new Firebase.AuthResultHandler() {
+                @Override
+                public void onAuthenticated(AuthData authData) {
+                    System.out.println("User ID: " + authData.getUid() + ", Provider: " + authData.getProvider());
+                    Log.d("Result: ", "Succesfully Logged in");
+                }
+
+                @Override
+                public void onAuthenticationError(FirebaseError firebaseError) {
+                    p.setText("");
+                    p.setHint("Wrong Password");
+                    p.setHintTextColor(Color.RED);
+                    Log.d("Result: ", "Login Failed");
+                }
+            });
 
         }
     }
